@@ -1,0 +1,121 @@
+[
+  {
+    "provider": "claude",
+    "model": "opus-4.7",
+    "model_id": "claude-opus-4-7",
+    "size": 1876,
+    "expected": [
+      30,
+      30
+    ],
+    "predicted": [
+      30.0,
+      30.0
+    ],
+    "error_px": 0.0,
+    "elapsed_s": 14.6,
+    "raw": "30,30"
+  },
+  {
+    "provider": "claude",
+    "model": "opus-4.7",
+    "model_id": "claude-opus-4-7",
+    "size": 1876,
+    "expected": [
+      1846,
+      30
+    ],
+    "predicted": [
+      1786.0,
+      40.0
+    ],
+    "error_px": 60.8276253029822,
+    "elapsed_s": 13.0,
+    "raw": "1786,40"
+  },
+  {
+    "provider": "claude",
+    "model": "opus-4.7",
+    "model_id": "claude-opus-4-7",
+    "size": 1876,
+    "expected": [
+      30,
+      1846
+    ],
+    "predicted": [
+      30.0,
+      1846.0
+    ],
+    "error_px": 0.0,
+    "elapsed_s": 12.5,
+    "raw": "30,1846"
+  },
+  {
+    "provider": "claude",
+    "model": "opus-4.7",
+    "model_id": "claude-opus-4-7",
+    "size": 1876,
+    "expected": [
+      1846,
+      1846
+    ],
+    "predicted": [
+      1846.0,
+      1846.0
+    ],
+    "error_px": 0.0,
+    "elapsed_s": 16.0,
+    "raw": "1846,1846"
+  },
+  {
+    "provider": "claude",
+    "model": "opus-4.7",
+    "model_id": "claude-opus-4-7",
+    "size": 1876,
+    "expected": [
+      938,
+      938
+    ],
+    "predicted": [
+      938.0,
+      938.0
+    ],
+    "error_px": 0.0,
+    "elapsed_s": 21.8,
+    "raw": "938,938"
+  },
+  {
+    "provider": "claude",
+    "model": "opus-4.7",
+    "model_id": "claude-opus-4-7",
+    "size": 1876,
+    "expected": [
+      625,
+      1250
+    ],
+    "predicted": [
+      625.0,
+      1250.0
+    ],
+    "error_px": 0.0,
+    "elapsed_s": 17.0,
+    "raw": "625,1250"
+  },
+  {
+    "provider": "claude",
+    "model": "opus-4.7",
+    "model_id": "claude-opus-4-7",
+    "size": 1876,
+    "expected": [
+      1250,
+      625
+    ],
+    "predicted": [
+      1250.0,
+      625.0
+    ],
+    "error_px": 0.0,
+    "elapsed_s": 31.8,
+    "raw": "1250,625"
+  }
+]
