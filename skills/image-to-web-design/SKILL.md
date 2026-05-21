@@ -1,11 +1,11 @@
 ---
 name: image-to-web-design
-description: End-to-end conversion of a design image into a React webpage with visual comparison against the source. Use when an agent receives a screenshot, mockup, or painted reference and needs to produce HTML/JSX/Tailwind that closely matches the image, render the result, and iteratively close the visual gap. Orchestrates `../crop-tool` (slicing), `image-isolation-technique` (asset extraction), React synthesis, headless rendering, and vision-LLM diffing.
+description: End-to-end conversion of a design image into a React webpage with visual comparison against the source. Use when an agent receives a screenshot, mockup, or painted reference and needs to produce HTML/JSX/Tailwind that closely matches the image, render the result, and iteratively close the visual gap. Orchestrates `image-cut` (slicing), `image-isolation-technique` (asset extraction), React synthesis, headless rendering, and vision-LLM diffing.
 ---
 
 # image-to-web-design
 
-End-to-end pipeline: design image in → rendered React webpage out, with a visual-diff loop to close the gap. This skill is the orchestrator. It defers all pixel-level work to [`image-isolation-technique`](../image-isolation-technique/SKILL.md) (which in turn defers to [`image-edit-instruction`](../image-edit-instruction/SKILL.md)) and all cropping to [`../crop-tool`](../../../crop-tool/SKILL.md).
+End-to-end pipeline: design image in → rendered React webpage out, with a visual-diff loop to close the gap. This skill is the orchestrator. It defers all pixel-level work to [`image-isolation-technique`](../image-isolation-technique/SKILL.md) (which in turn defers to [`image-edit-instruction`](../image-edit-instruction/SKILL.md)) and all cropping to [`image-cut`](../image-cut/SKILL.md).
 
 The stages are in order. Each stage's output feeds the next; sniff-test visually between stages and stop early if a stage produces something that won't survive the next one.
 
@@ -59,7 +59,7 @@ The audit is the spec. Every element becomes either a JSX element, a positioned 
 
 For each section in the audit, do the per-section pipeline:
 
-1. **Crop the section** out of the source with `../crop-tool` using the section's `bbox`. Save as `<section>/00_original.png`.
+1. **Crop the section** out of the source with [`image-cut`](../image-cut/SKILL.md) using the section's `bbox`. Save as `<section>/00_original.png`.
 2. **Identify overlay elements** in the section that need extracting (subjects, badges, custom-shape decorations).
 3. **For each overlay element on a non-uniform background**, run the two-track extraction recipe from `image-isolation-technique`:
    - Element track → transparent PNG asset under `<section>/assets/`.

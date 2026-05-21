@@ -1,11 +1,11 @@
 ---
 name: image-isolation-technique
-description: Recipes for extracting clean assets from a cropped region of an image — element track, background track, and outpaint. Use when an agent needs to isolate a component from its parent background, extract a continuous background patch under an overlay, or extend an image's canvas. Composes `image-edit-instruction` (AI edit primitive), `../crop-tool` (cropping), and `rembg` (alpha matting); introduces no new mechanisms.
+description: Recipes for extracting clean assets from a cropped region of an image — element track, background track, and outpaint. Use when an agent needs to isolate a component from its parent background, extract a continuous background patch under an overlay, or extend an image's canvas. Composes `image-edit-instruction` (AI edit primitive), `image-cut` (cropping), and `rembg` (alpha matting); introduces no new mechanisms.
 ---
 
 # image-isolation-technique
 
-Recipes for working with a cropped piece of a design image. The skill assumes you have already used [`../crop-tool`](../../../crop-tool/SKILL.md) (or any other cropper) to slice out the region you want to work on, and that you have access to the [`image-edit-instruction`](../image-edit-instruction/SKILL.md) primitive for the actual AI edits.
+Recipes for working with a cropped piece of a design image. The skill assumes you have already used [`image-cut`](../image-cut/SKILL.md) (or any other cropper) to slice out the region you want to work on, and that you have access to the [`image-edit-instruction`](../image-edit-instruction/SKILL.md) primitive for the actual AI edits.
 
 This is a recipe book, not a primitive. The agent reading it decides which recipe to apply, runs the steps, and looks at the results between calls. There is no internal loop and no automatic verification.
 
@@ -17,7 +17,7 @@ The reason: both downstream recipes (element track, background track) need to se
 
 A safe default: include at least 20% extra space on each side of the target's bounding box. More if the parent has obvious large-scale texture (brush strokes, lighting gradients, foliage) that the editor will need to continue.
 
-Do the actual cropping with `../crop-tool`'s `crop.py` (or equivalent). This skill does not duplicate cropping mechanics — it just tells you how much to crop.
+Do the actual cropping with [`image-cut`](../image-cut/SKILL.md)'s `crop.py` (or equivalent). This skill does not duplicate cropping mechanics — it just tells you how much to crop.
 
 ## Iterative isolation loop
 
