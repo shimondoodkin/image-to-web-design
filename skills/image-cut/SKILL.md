@@ -5,6 +5,14 @@ description: Use when an agent needs to isolate UI elements (icons, components, 
 
 # Image-Cut
 
+> **Part of the [image-to-web-design](https://github.com/shimondoodkin/image-to-web-design) kit.**
+> The CLI scripts this skill calls live in `tools/` next to this file. If
+> you found this SKILL.md on its own (without `tools/`), the canonical kit
+> has both together along with the sibling skills it composes with
+> (`image-edit-instruction`, `image-isolation-technique`,
+> `image-to-web-design`) — install with
+> `npx skills add shimondoodkin/image-to-web-design`.
+
 Tools for slicing website screenshots into pixel-perfect element images,
 with reliable coordinate translation through Claude's vision pipeline.
 

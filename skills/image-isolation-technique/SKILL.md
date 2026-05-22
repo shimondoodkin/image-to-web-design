@@ -5,6 +5,14 @@ description: Recipes for extracting clean assets from a cropped region of an ima
 
 # image-isolation-technique
 
+> **Part of the [image-to-web-design](https://github.com/shimondoodkin/image-to-web-design) kit.**
+> This skill composes [`image-edit-instruction`](../image-edit-instruction/SKILL.md)
+> (the AI edit primitive) and [`image-cut`](../image-cut/SKILL.md) (cropping
+> CLIs), and ships a supporting PIL snippet at
+> [`_examples/outpaint_mask.py`](_examples/outpaint_mask.py). If you found
+> this file on its own, the canonical kit has everything together —
+> `npx skills add shimondoodkin/image-to-web-design`.
+
 Recipes for working with a cropped piece of a design image. The skill assumes you have already used [`image-cut`](../image-cut/SKILL.md) (or any other cropper) to slice out the region you want to work on, and that you have access to the [`image-edit-instruction`](../image-edit-instruction/SKILL.md) primitive for the actual AI edits.
 
 This is a recipe book, not a primitive. The agent reading it decides which recipe to apply, runs the steps, and looks at the results between calls. There is no internal loop and no automatic verification.

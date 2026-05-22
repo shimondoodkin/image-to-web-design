@@ -5,6 +5,14 @@ description: End-to-end conversion of a design image into a React webpage with v
 
 # image-to-web-design
 
+> **Part of the [image-to-web-design](https://github.com/shimondoodkin/image-to-web-design) kit.**
+> This orchestrator defers all pixel work to
+> [`image-isolation-technique`](../image-isolation-technique/SKILL.md)
+> (which in turn calls [`image-edit-instruction`](../image-edit-instruction/SKILL.md))
+> and all cropping to [`image-cut`](../image-cut/SKILL.md). If you found
+> this file on its own, install the full kit so the recipes referenced
+> below resolve — `npx skills add shimondoodkin/image-to-web-design`.
+
 End-to-end pipeline: design image in → rendered React webpage out, with a visual-diff loop to close the gap. This skill is the orchestrator. It defers all pixel-level work to [`image-isolation-technique`](../image-isolation-technique/SKILL.md) (which in turn defers to [`image-edit-instruction`](../image-edit-instruction/SKILL.md)) and all cropping to [`image-cut`](../image-cut/SKILL.md).
 
 The stages are in order. Each stage's output feeds the next; sniff-test visually between stages and stop early if a stage produces something that won't survive the next one.

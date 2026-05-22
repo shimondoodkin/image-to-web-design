@@ -5,6 +5,12 @@ description: One AI-driven image edit call. Use when an agent needs to remove, i
 
 # image-edit-instruction
 
+> **Part of the [image-to-web-design](https://github.com/shimondoodkin/image-to-web-design) kit.**
+> Sibling skills that compose with this one: `image-isolation-technique`,
+> `image-cut`, `image-to-web-design`. If you found this file on its own,
+> the full kit gives you the recipes and tooling that use this primitive —
+> install with `npx skills add shimondoodkin/image-to-web-design`.
+
 ## Purpose
 
 One call, one AI-driven image edit. The only piece of the image-editing kit with a novel mechanism: agent-specific dispatch. Everything else (iterative isolation, two-track extraction, outpaint, the webpage builder) composes calls to this primitive.
