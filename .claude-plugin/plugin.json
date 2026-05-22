@@ -1,5 +1,5 @@
 {
-  "name": "image-to-components",
+  "name": "image-to-web-design",
   "version": "0.1.0",
   "description": "A kit of agent-facing skills for converting design images into pixel-perfect React webpages: an atomic AI image-edit primitive, isolation recipes, cropping CLIs with reliable coordinate translation, and an end-to-end orchestrator that audits, synthesises, and visually diffs the result against the source.",
   "author": {

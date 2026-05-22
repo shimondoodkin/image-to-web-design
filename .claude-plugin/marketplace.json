@@ -1,0 +1,30 @@
+{
+  "name": "image-to-web-design",
+  "description": "Marketplace hosting the image-to-web-design plugin: agent-facing skills for converting design images into pixel-perfect React webpages.",
+  "owner": {
+    "name": "Shimon Doodkin",
+    "email": "shimondoodkin@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "image-to-web-design",
+      "source": "./",
+      "description": "A kit of four layered skills (image-edit-instruction, image-isolation-technique, image-cut, image-to-web-design) for the design-image-to-React-webpage pipeline.",
+      "author": {
+        "name": "Shimon Doodkin",
+        "email": "shimondoodkin@gmail.com"
+      },
+      "repository": "https://github.com/shimondoodkin/image-to-web-design",
+      "license": "MIT",
+      "keywords": [
+        "image-editing",
+        "react",
+        "design-to-code",
+        "vision",
+        "skills",
+        "agent-skill"
+      ],
+      "category": "design"
+    }
+  ]
+}

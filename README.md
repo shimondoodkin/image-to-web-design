@@ -53,12 +53,19 @@ npx skills add shimondoodkin/image-to-web-design -a codex
 
 ### Claude Code native plugin path
 
-For Claude Code users, the repo also ships a `.claude-plugin/plugin.json`
-manifest, so `/plugin install` works directly:
+For Claude Code users, the repo is its own marketplace — it ships both
+`.claude-plugin/marketplace.json` (the catalog) and `.claude-plugin/plugin.json`
+(the plugin manifest). Install in two steps from inside Claude Code:
 
 ```text
-/plugin install shimondoodkin/image-to-web-design
+/plugin marketplace add shimondoodkin/image-to-web-design
+/plugin install image-to-web-design@image-to-web-design
 ```
+
+The first command registers the marketplace; the second installs the plugin
+from it. After install, the four skills are namespaced under the plugin
+(`/image-to-web-design:image-edit-instruction`, etc.) and Claude Code
+auto-updates the plugin when you push new commits.
 
 This is equivalent to `npx skills add ... -a claude-code` but uses Claude
 Code's built-in plugin loader.
