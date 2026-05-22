@@ -1,4 +1,4 @@
-# image-to-components
+# image-to-web-design
 
 A small kit of agent-facing skills for converting design images into
 pixel-perfect, responsive React webpages — and verifying the result against
