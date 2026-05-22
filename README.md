@@ -27,15 +27,81 @@ image-to-web-design
 
 ## Install
 
+The kit follows the [Agent Skills](https://www.npmjs.com/package/skills) shared
+specification — `SKILL.md` files with YAML frontmatter under `skills/`. Any
+compatible installer can consume this repo directly from GitHub; no per-repo
+manifest is required.
+
+### One command for any supported agent — `npx skills`
+
+[`vercel-labs/skills`](https://github.com/vercel-labs/skills) supports 54+
+agents including all three primary consumers of this kit: Claude Code CLI,
+Codex CLI, and Hermes Agent.
+
 ```bash
-pip install -e .[dev]
+# Install all four skills to every detected agent
+npx skills add <you>/image-to-components
+
+# Install one skill to specific agents
+npx skills add <you>/image-to-components \
+    --skill image-edit-instruction \
+    -a claude-code -a hermes-agent
+
+# Single agent
+npx skills add <you>/image-to-components -a codex
 ```
 
-Or just the runtime dependency:
+Replace `<you>` with the GitHub owner once published.
+
+### Claude Code native plugin path
+
+For Claude Code users, the repo also ships a `.claude-plugin/plugin.json`
+manifest, so `/plugin install` works directly:
+
+```text
+/plugin install <you>/image-to-components
+```
+
+This is equivalent to `npx skills add ... -a claude-code` but uses Claude
+Code's built-in plugin loader.
+
+### Skillfish
+
+[`knoxgraeme/skillfish`](https://github.com/knoxgraeme/skillfish) (33 agents)
+also installs this kit; note Hermes Agent isn't currently in its supported
+list, so Hermes users should prefer `npx skills`.
+
+```bash
+npx skillfish add <you>/image-to-components
+```
+
+### Manual clone
+
+```bash
+git clone https://github.com/<you>/image-to-components.git ~/.claude/skills/image-to-components
+# or for Codex:
+git clone https://github.com/<you>/image-to-components.git ~/.codex/skills/image-to-components
+# or for Hermes:
+git clone https://github.com/<you>/image-to-components.git ~/.hermes/skills/image-to-components
+```
+
+Each agent will auto-discover the four skills under `skills/` on next start.
+
+### Python dependencies (for `image-cut` CLIs)
+
+The `image-cut` skill ships Python CLIs that depend on Pillow. Install
+once:
 
 ```bash
 pip install Pillow
+
+# Or, for development with the test suite:
+pip install -e .[dev]
 ```
+
+The CLIs are invoked directly by the skill instructions
+(`python skills/image-cut/tools/crop.py ...`); no `PATH` entry or
+`pip install -e .` is strictly required for skill use.
 
 ## Tests
 
