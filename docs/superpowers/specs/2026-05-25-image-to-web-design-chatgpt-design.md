@@ -220,8 +220,11 @@ Accept the current draft and stop iterating when any of:
   unchanged. The new skill's `tools/vision_prep.py` is OpenAI-only.
 - Does **not** modify the existing four skill folders. They keep
   working for Claude users in Claude Code.
-- Does **not** ship a `plugin.json` change. The new skill is picked up
-  by Claude Code's normal skill discovery when the folder is present.
+- Does **not** modify any existing skill source file. The only
+  outside-the-new-folder change is one line in `.claude-plugin/plugin.json`
+  to add the new skill path to its explicit `skills` whitelist (the
+  manifest enumerates skills rather than auto-discovering, so a new
+  folder alone is not enough).
 
 ## Open items for the implementation plan
 
