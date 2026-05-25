@@ -97,3 +97,32 @@ def test_vp_receipt_shape(tmp_dir):
     assert abs(data["op"]["scale"] - expected_scale) < 1e-9
     assert data["op"]["scaled_size"] == list(expected_size)
     assert data["output"]["size"] == list(expected_size)
+
+
+def test_vp_translate_through_chain(tmp_dir):
+    """Crop then vision_prep, translate (0,0) of vp output back to original."""
+    screenshot = tmp_dir / "screen.png"
+    Image.new("RGB", (3000, 3000), "white").save(screenshot)
+
+    rough = tmp_dir / "rough.png"
+    r = subprocess.run(
+        [sys.executable, "tools/crop.py", str(screenshot),
+         "--bbox", "100,200,2100,2200", "--out", str(rough)],
+        capture_output=True, text=True,
+    )
+    assert r.returncode == 0, r.stderr
+
+    vp = tmp_dir / "vp.png"
+    r = run_vp([str(rough), "--out", str(vp)])
+    assert r.returncode == 0, r.stderr
+
+    # Point (0, 0) in vp output → source (0, 0) of rough → (100, 200) global.
+    r = subprocess.run(
+        [sys.executable, "tools/translate.py",
+         "--chain", str(rough) + ".json", str(vp) + ".json",
+         "--point", "0,0", "--to", "global", "--round"],
+        capture_output=True, text=True,
+    )
+    assert r.returncode == 0, r.stderr
+    data = json.loads(r.stdout)
+    assert data["global"] == [100, 200]
