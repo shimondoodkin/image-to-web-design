@@ -19,6 +19,7 @@
     "./skills/image-edit-instruction",
     "./skills/image-isolation-technique",
     "./skills/image-cut",
-    "./skills/image-to-web-design"
+    "./skills/image-to-web-design",
+    "./skills/image-to-web-design-chatgpt"
   ]
 }
