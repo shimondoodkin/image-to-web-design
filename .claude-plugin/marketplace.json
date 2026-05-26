@@ -9,7 +9,7 @@
     {
       "name": "image-to-web-design",
       "source": "./",
-      "description": "A kit of four layered skills (image-edit-instruction, image-isolation-technique, image-cut, image-to-web-design) for the design-image-to-React-webpage pipeline.",
+      "description": "A kit of five skills for the design-image-to-React-webpage pipeline: four layered primitives (image-edit-instruction, image-isolation-technique, image-cut, image-to-web-design) plus a self-contained ChatGPT edition (image-to-web-design-chatgpt).",
       "author": {
         "name": "Shimon Doodkin",
         "email": "shimondoodkin@gmail.com"
