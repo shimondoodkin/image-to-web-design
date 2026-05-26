@@ -1,4 +1,4 @@
-"""Shared helpers for image-cut tools."""
+"""Shared helpers for image-to-web-design-chatgpt tools."""
 from __future__ import annotations
 import json
 import sys
