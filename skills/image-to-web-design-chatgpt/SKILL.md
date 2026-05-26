@@ -64,7 +64,7 @@ python tools/translate.py --chain region.png.json region_v.png.json --point RX,R
 
 ### Inline fallback
 
-If `tools/vision_prep.py` isn't available, paste this into your code interpreter — it does the same OpenAI vision_prep without the unsharp-mask polish (coordinates round-trip within ≤1 px of the CLI version):
+If `tools/vision_prep.py` isn't available, paste this into your code interpreter — it does the same OpenAI vision_prep:
 
 ```python
 from PIL import Image
