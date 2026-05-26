@@ -19,7 +19,9 @@ This is a recipe book, not a primitive. The agent reading it decides which recip
 
 ## Crop strategy
 
-**Rule.** When the parent background is non-uniform (painted hero, photographic scene, gradient with detail), crop *loose* around the target — leave a generous margin of surrounding context. When the parent background is solid or flat, tight cropping is fine.
+**Rule.** When the parent background is non-uniform (painted hero, photographic scene, gradient with detail), crop *loose* around the target — leave a generous margin of surrounding context. When the background is solid or flat, tight cropping is fine.
+
+**Subject Verification Checklist:** Before executing any crop, check that the bounding box fully contains the target subject, component, or background details without clipping any elements (e.g., instrument bells, hats, fingers, outer borders). If any part of the subject is cut off, expand the bounding box to capture the subject in its entirety.
 
 The reason: both downstream recipes (element track, background track) need to see the surrounding pixels in order to reason about texture continuity. A tight crop that runs flush against the target gives the editor nothing to extrapolate from, and the result will look pasted-in.
 
@@ -70,16 +72,28 @@ Goal: a clean cutout of the component on a flat field, ready for alpha matting.
 
 Instruction template:
 
-> Keep only the {component description} in the {position}. Replace everything else with solid white #FFFFFF. Do not modify the {component description} itself.
+> Keep only the {component description} in the {position}. Replace everything else with solid white #FFFFFF.
 
 Concrete example for a red "NEW" badge in the top right:
 
-> Keep only the red "NEW" badge in the top-right corner around (1700, 90). Replace everything else with solid white #FFFFFF. Do not modify the badge itself.
+> Keep only the red "NEW" badge in the top-right corner around (1700, 90). Replace everything else with solid white #FFFFFF.
 
-After the editor returns the flattened image, run `rembg` for clean alpha:
+After the editor returns the flattened image, ensure `rembg` is installed with CLI and CPU support:
+
+```bash
+pip install "rembg[cpu,cli]"
+```
+
+Then run background removal:
 
 ```bash
 rembg i flattened.png component.png
+```
+
+For high-quality subject isolation (like band members or complex foregrounds), use the `bria-rmbg` model:
+
+```bash
+rembg i -m bria-rmbg flattened.png component.png
 ```
 
 For soft-edged subjects (painted hair, fur, watercolour), use a model tuned for soft mattes:

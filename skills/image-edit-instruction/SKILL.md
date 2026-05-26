@@ -69,20 +69,18 @@ There is no enforced default order. Try the one most likely for the content; if 
 
 ```bash
 codex exec \
-    -i "${IMAGE}" \
     --sandbox workspace-write \
     --skip-git-repo-check \
-    "${INSTRUCTION}. Save the edited image to ${OUT}."
+    "take file '${IMAGE}'. ${INSTRUCTION} Save the edited image to ${OUT}."
 ```
 
 With a mask:
 
 ```bash
 codex exec \
-    -i "${IMAGE}" -i "${MASK}" \
     --sandbox workspace-write \
     --skip-git-repo-check \
-    "${INSTRUCTION}. The second attached image is a mask: white=editable, black=preserve. Save the edited image to ${OUT}."
+    "take file '${IMAGE}' and mask file '${MASK}' (white=editable, black=preserve). ${INSTRUCTION} Save the edited image to ${OUT}."
 ```
 
 #### gemini (headless) invocation
@@ -116,6 +114,7 @@ Three rules. Apply them when writing `instruction`.
   - Bad: *"Remove the badge."*
 - **Forbid invention.** End with *"Do not add new objects or text."* and, where relevant, *"Replace only with the surrounding texture."* Editors will happily hallucinate plausible content into a removed area; the only defence is asking them not to.
 - **One element per call.** Multi-element instructions degrade fast. Removing three things is three calls with three intermediate output files — not one big prompt.
+- **Avoid negative preservation constraints.** Do not include constraints like *"Do not modify the subject itself"* or *"Do not change the musicians"*. Negative constraints telling the model what to preserve often confuse the editor and cause it to choose over-engineered execution paths (like writing complex scripts) instead of performing a simple visual edit. Trust the model to focus only on the targeted area.
 
 ## Mask conventions
 
