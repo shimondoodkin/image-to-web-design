@@ -17,6 +17,21 @@ End-to-end pipeline: design image in → rendered React webpage out, with a visu
 
 The stages are in order. Each stage's output feeds the next; sniff-test visually between stages and stop early if a stage produces something that won't survive the next one.
 
+## Load the full kit FIRST — before stage 1
+
+> [!IMPORTANT]
+> This file is **orchestration only**. Every how-to detail — cropping, coordinate math, the removal loop, two-track extraction, outpaint, seam/colour matching, the AI-edit primitive and its backends — lives in the sibling skills. **Read all of them up front, before you crop a single pixel.**
+>
+> Do **not** lazy-load them one stage at a time. Lazy-loading is the single biggest cause of steps executed with the wrong technique (observed in real runs: a section was cropped too tight, a subject isolated without the green-screen+rembg recipe, seams left mismatched — all because the relevant sub-skill hadn't been read yet).
+
+Invoke/read every sibling skill now, in this order, and keep them in context for the whole job:
+
+1. [`image-cut`](../image-cut/SKILL.md) — slicing screenshots, vision-safe sizing, translating coordinates back to the original.
+2. [`image-isolation-technique`](../image-isolation-technique/SKILL.md) — the iterative removal loop, two-track (element + background) extraction, the outpaint recipe, and the colour/seam-matching tricks.
+3. [`image-edit-instruction`](../image-edit-instruction/SKILL.md) — the one AI-edit primitive and backend selection (`codex-imagegen` / `codex` / `gemini`).
+
+If any reference fails to resolve, the kit isn't fully installed — run `npx skills add shimondoodkin/image-to-web-design` and re-read before continuing. Only once all four skills (this one + the three above) are in context do you start the audit.
+
 ## Design audit / element inventory
 
 Before touching pixels, ask a vision LLM to produce a structured inventory of every element in the source. The inventory becomes both the removal plan (for the isolation skill) and the component spec (for synthesis).
@@ -205,6 +220,64 @@ Per design, a single working directory holds everything:
 ```
 
 Numbered, never overwritten. Anyone (human or agent) can walk the directory and sniff-test the pipeline by opening files in order.
+
+## Field notes (lessons from real builds)
+
+Hard-won specifics from actual runs. Each is **symptom → what to do**. They apply whether you synthesize React/Tailwind or plain HTML+CSS — the kit defaults to React but the pixel + layout techniques are framework-neutral.
+
+### Cropping & measuring the source
+
+- **One mockup often contains several viewports** (a phone and a desktop side by side, with "MOBILE FIRST" / "DESKTOP" annotation labels). Split them into separate source images *first*, and drop the annotation labels from the crop. Treat each as its own audit + region-work pass.
+- **Measure seams with a tall, full-height probe, not short strips.** Short wide strips at 1:1 misread horizontal boundaries badly (a phone's right edge read ~190px on a short strip but ~365px on a tall one — the tall one was right). When a coordinate looks surprising, re-probe with a column that spans the full height of the region.
+- **Crop the whole section to its natural boundary, not a tight sub-box.** Isolating a "hero background" by cropping only the hero sliced the festive art in half. Crop down to where the art actually fades to white / the next section begins. The user's phrase "the *top part*, not the hero" means exactly this.
+
+### The edit backend redraws wholesale
+
+- **Backend used: the `codex-imagegen` command** — a standalone skill that posts directly to the ChatGPT-Codex image endpoint reusing Codex's OAuth (`~/.codex/auth.json`, no `OPENAI_API_KEY`): `python scripts/imagegen.py edit --image in.png [--image ref.png] [--mask m.png] --size WxH --out out.png --prompt "…"` (also `generate` / `generate-batch`). It is the concrete realization of `image-edit-instruction` for a Claude agent; see that skill for backend selection. The caveats below are its behaviour.
+- **The hosted image-edit tool (codex / gpt-image) regenerates the entire image**, it does not do true masked inpaint. Consequences:
+  - For "keep only the subject, solid green everywhere else" isolation, *and* for fixing content (a detached/duplicated instrument, a wrong hand) — do both in **one** prompt; it's all one redraw anyway.
+  - To fix a shape **cut off at an edge**, don't bother with a mask + outpaint — just regenerate with `"keep a clean margin along the {edge}; every shape fully rounded and contained; nothing touching the {edge}"`. More reliable than masked outpaint here.
+- **Aspect-ratio is limited.** Extreme ratios are rejected (`image_generation_user_error / invalid_value`): ~4:1 (e.g. `1792x416`) failed; `2048x1024` (2:1) worked; `2048x720` (~2.84:1) worked. For wide banners stay ≲ 2.85:1, or generate at 2:1 and crop. Generate big, then post-process (resize/recolor/pad) with PIL.
+
+### Subjects: chroma-key, then rembg
+
+- Isolate a subject by asking for it on **solid bright green (#00B140)** with everything else replaced by green, then `rembg` → transparent PNG, then trim to `getbbox()`. Green both reads as "isolate this" to the model and gives `rembg` a clean matte. Composite the result over magenta to eyeball the alpha edges before shipping.
+
+### Colour continuity is the thing that breaks first
+
+- **Section "whites" must be made equal, not assumed.** Generated art's white is ~`(254,254,254)`, *not* pure `#fff` and *not* a surface tint like `#FAFAFC`. Mismatched whites show as a visible band where an image area meets a CSS-coloured area. Fix: sample the art's white with PIL and set the page/section background to that exact value; prefer making the inner sections `background: transparent` and letting one shared wrapper colour show through.
+- **A "connector" colour (a wave/strip baked into one image that must merge into an adjacent solid section) will not match by luck.** Sample both with PIL; recolour the baked strip to the section's exact colour (`if max(r,g,b) < 46: px = TARGET`) so the seam disappears. Then set the adjacent CSS section to the *same* literal value.
+
+### Aligning a background to a content edge
+
+- **To make a background end exactly at a content boundary (bottom of the subject / top of the title), put the background on a wrapper sized to that content** — not on a width-scaled layer. `background-size: 100% auto` makes the art's height track the *viewport width*, so the bottom edge lands in a different place at every breakpoint. A wrapper whose height is its content pins the edge consistently.
+- **To show a banner fully with no crop and no distortion**, generate the art at the display box's aspect ratio and give the box that same `aspect-ratio` with `background-size: 100% 100%` (no distortion *because* the ratios match). `cover` crops; `contain` letterboxes.
+
+### Page-level background wrappers
+
+- For full-bleed art that must run continuously behind several sections, wrap them: a **top-bg wrapper** (festive art, `background-position: top`) around header+hero+features, and a **bottom-bg wrapper** (dark, `background-position: bottom`) around CTA+footer. Make the inner sections transparent so they read through. Opaque inner sections (cards, light panels) still cover the wrapper where needed.
+- Scope a per-element background to the element, not the wrapper, when only that element should carry it (e.g. a CTA's colourful art) — otherwise it "engulfs" neighbours or peeks out between them.
+
+### RTL gotchas
+
+- **Logical properties flip under `dir="rtl"`.** `inset-inline-start` became the *right* side. Use physical `left`/`right` when matching a specific visual side of the mockup.
+- Put `direction: ltr` on a header row to keep brand-left / CTA-right while leaving the nav's Hebrew text `direction: rtl`. Use `order` / `margin-inline-start: auto` to pin row icons to the correct edge.
+
+### Trust the mockup's pixels over the design-system doc
+
+- The written spec said "CTA = pink→purple gradient", but the *rendered* mockup used a **flat pink `#F4255C`**, and social glyphs were **dark on light circles**, not brand-pink. Eyedrop the mockup for real colours; the doc is aspirational.
+
+### Art-directed mobile is its own isolation pass
+
+- The mobile hero was a *different* composition (a full band photo vs. a desktop trio, a centred logo, its own leaf decoration). Crop + isolate on the mobile source separately, then swap via media queries / `<picture>`. Don't try to reuse the desktop assets.
+
+### Overlapping a scaled element (logo over a photo)
+
+- To overlap a logo over a photo, keep it centred, and have it scale with the viewport: absolutely position it (`left:50%; transform: translateX(-50%); top: …`) over a wrapper given `position: relative` and a `padding-top` that reserves the space; size it with `width: clamp(min, ~46vw, max)` so it stays proportional and centred at every width.
+
+### Loop in the browser at several widths
+
+- Render and screenshot at desktop **and** multiple phone widths (e.g. 390 and 600). Band gaps, colour seams, cut edges, RTL flips, and "logo too small/high when wider" only reveal themselves at specific widths. Serve the folder (`python -m http.server`) and drive it headless to iterate.
 
 ## Out of scope
 

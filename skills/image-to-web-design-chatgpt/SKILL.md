@@ -101,24 +101,25 @@ Concrete example for a red "NEW" badge in the top right:
 
 > Keep only the red "NEW" badge in the top-right corner around (1700, 90). Replace everything else with solid white #FFFFFF.
 
-**Step 2 — alpha matte with rembg.** In your code interpreter:
+**Step 2 — alpha matte with rembg.** In your code interpreter, call the **library API**, not the CLI — the `rembg` console script isn't reliably on `PATH` in the sandbox and `python -m rembg` doesn't work. The library only needs the base package, reuses one model session across cutouts, and trims the alpha in the same pass:
 
-```bash
-pip install "rembg[cpu,cli]"
-rembg i flattened.png component.png
+```python
+# pip install "rembg[cpu,cli]"   # first use; downloads the model
+from rembg import remove, new_session
+from PIL import Image
+
+session = new_session("birefnet-general")     # pick a model (below); omit session= for the u2net default
+cut = remove(Image.open("flattened.png"), session=session)   # RGBA
+cut = cut.crop(cut.getbbox())                  # trim transparent margins
+cut.save("component.png")
 ```
 
-For complex foregrounds (band members, hands, hair against busy backgrounds):
+**Model choice (matters more than any flag):**
+- `u2net` (default) — clean subject on a flat field (e.g. a figure chroma-keyed onto solid green).
+- `bria-rmbg` — complex foregrounds: band members, hands, hair against busy backgrounds.
+- `birefnet-general` — soft / painted edges (hair, fur, watercolour); slowest.
 
-```bash
-rembg i -m bria-rmbg flattened.png component.png
-```
-
-For soft-edged subjects (painted hair, fur, watercolour):
-
-```bash
-rembg i -m birefnet-general flattened.png component.png
-```
+Cleaner wispy edges: `remove(img, session=s, alpha_matting=True, alpha_matting_erode_size=10)`. Always composite the cutout over magenta and look at the edges before placing it.
 
 Record the component's original position and size from the audit so the synthesis step (§6) can place it correctly.
 

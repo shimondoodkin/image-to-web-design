@@ -78,29 +78,43 @@ Concrete example for a red "NEW" badge in the top right:
 
 > Keep only the red "NEW" badge in the top-right corner around (1700, 90). Replace everything else with solid white #FFFFFF.
 
-After the editor returns the flattened image, ensure `rembg` is installed with CLI and CPU support:
+After the editor returns the flattened image, alpha-matte it with `rembg`. Install once: `pip install "rembg[cpu,cli]"` (or `[gpu,cli]`); the first run downloads the model.
 
-```bash
-pip install "rembg[cpu,cli]"
+**Prefer the library API over the CLI.** The `rembg` console script is not always on `PATH` (notebook / code-interpreter / ChatGPT sandboxes, minimal installs), and `python -m rembg` does **not** work (there is no `__main__`). The library always works once the base package is installed, lets you reuse one model session across many cutouts (load the model once — far faster), and trims the alpha in the same pass:
+
+```python
+from rembg import remove, new_session
+from PIL import Image
+
+session = new_session("birefnet-general")     # pick a model (see below); omit session= for the u2net default
+cut = remove(Image.open("flattened.png"), session=session)   # returns RGBA
+cut = cut.crop(cut.getbbox())                  # trim fully-transparent margins
+cut.save("component.png")
 ```
 
-Then run background removal:
-
-```bash
-rembg i flattened.png component.png
-```
-
-For high-quality subject isolation (like band members or complex foregrounds), use the `bria-rmbg` model:
-
-```bash
-rembg i -m bria-rmbg flattened.png component.png
-```
-
-For soft-edged subjects (painted hair, fur, watercolour), use a model tuned for soft mattes:
+CLI equivalent, when the console script *is* on `PATH`:
 
 ```bash
 rembg i -m birefnet-general flattened.png component.png
 ```
+
+**Model choice matters more than any flag:**
+
+- `u2net` (default) — fine for a clean subject on a flat field (e.g. a chroma-keyed figure on solid green).
+- `bria-rmbg` — strongest general matte for complex foregrounds (band members, hands, hair against busy backgrounds).
+- `birefnet-general` — best for soft / painted edges (hair, fur, watercolour); slowest.
+- `u2net_human_seg` / `isnet-general-use` — tuned for people / general objects respectively.
+
+**Cleaner edges (optional):** turn on alpha matting — `remove(img, session=s, alpha_matting=True, alpha_matting_foreground_threshold=240, alpha_matting_background_threshold=10, alpha_matting_erode_size=10)` (CLI: `-a -ae 10`). It helps wispy edges but can nibble thin features, so look before trusting it.
+
+**Always verify the matte:** composite the cutout over magenta and inspect the edges before shipping —
+
+```python
+bg = Image.new("RGBA", cut.size, (255, 0, 255, 255))
+Image.alpha_composite(bg, cut).convert("RGB").save("component_check.png")
+```
+
+Reuse the one `session` for every subject in a batch.
 
 The final asset is a transparent PNG of the component. Record the component's original position and size from the audit / bbox so downstream code can place it correctly.
 

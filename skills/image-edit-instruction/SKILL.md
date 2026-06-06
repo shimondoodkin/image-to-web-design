@@ -65,6 +65,21 @@ Shell out to a CLI sub-agent. Both `codex` and `gemini` work for this; on a host
 
 There is no enforced default order. Try the one most likely for the content; if the result is off, retry with the other backend.
 
+#### codex-imagegen (direct HTTPS — recommended when available)
+
+If the standalone **`codex-imagegen`** skill is installed, prefer it over shelling into the full `codex` CLI: it's pure-Python HTTPS straight to the ChatGPT-Codex `image_generation` endpoint, reusing Codex's stored OAuth (`~/.codex/auth.json`) — no `OPENAI_API_KEY`, no agent loop, deterministic file output, and a real `--size`/`--resize`.
+
+```bash
+python "$CODEX_IMAGEGEN/scripts/imagegen.py" edit \
+    --image "${IMAGE}" [--image "${REF}"] [--mask "${MASK}"] \
+    --size 1024x1024 \
+    --out "${OUT}" \
+    --prompt "${INSTRUCTION}"
+# also: generate (text→image) and generate-batch (JSONL, parallel)
+```
+
+Caveats (observed): the call **redraws the whole image** (no true masked inpaint — `--mask` is a best-effort prompt hint). `--size` must be ÷16 and ≥ ~0.65 MP, and **extreme aspect ratios are rejected** (~4:1 → `image_generation_user_error / invalid_value`; 2:1 and ~2.84:1 work). For wide banners, generate at ≤ ~2.85:1 or at 2:1 and crop, then post-process (resize/recolor/pad) with PIL.
+
 #### codex (headless) invocation
 
 ```bash
