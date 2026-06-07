@@ -148,7 +148,7 @@ quality 98.
   each probe's edge point to global. Assemble final bbox from translated
   values.
 
-## Zero-config coordinate prep — `prep_claude` + `resolve_coords`
+## Zero-config coordinate prep — `prep_claude` + `resolve_coords_claude`
 
 For Claude coordinate work, two single-purpose tools bake in the settled
 findings from the 2026-06-07 Opus 4.8 study
@@ -160,11 +160,11 @@ findings from the 2026-06-07 Opus 4.8 study
 python tools/prep_claude.py screenshot.png --out look.png      # [--model opus-4.8]
 
 # 2. ask Claude for coordinates in look.png, then map them back to the original
-python tools/resolve_coords.py --output look.png \
+python tools/resolve_coords_claude.py --output look.png \
     --coords '{"logo":[40,30],"cta":[700,480,760,510]}'
 ```
 
-`resolve_coords` accepts points `[x,y]`, boxes `[x1,y1,x2,y2]`, polygons, point
+`resolve_coords_claude` accepts points `[x,y]`, boxes `[x1,y1,x2,y2]`, polygons, point
 dicts `{"x":..,"y":..}`, **named entities** and nested **arrays** — shape
 preserved. Reads the transform from `look.png.json` (exact) or `--input`.
 

@@ -25,9 +25,9 @@ Coordinates come from --coords (inline JSON), -f FILE, or stdin; the resolved
 structure is printed as JSON (and written to --out-json if given).
 
 Examples:
-  resolve_coords.py --output prepped.png --coords '[384, 540]'
-  resolve_coords.py --output prepped.png --coords '{"logo":[40,30],"cta":[700,520,760,560]}'
-  resolve_coords.py --input orig.png -f detections.json
+  resolve_coords_claude.py --output prepped.png --coords '[384, 540]'
+  resolve_coords_claude.py --output prepped.png --coords '{"logo":[40,30],"cta":[700,520,760,560]}'
+  resolve_coords_claude.py --input orig.png -f detections.json
   echo '[[100,100],[700,500]]' | resolve_coords.py --output prepped.png
 """
 from __future__ import annotations
