@@ -53,6 +53,7 @@ MODEL_LIMITS: dict[str, dict] = {
     "opus-4.6": {"family": "claude", "max_long_edge": 1568, "max_tokens": 1568},
     "haiku": {"family": "claude", "max_long_edge": 1568, "max_tokens": 1568},
     "opus-4.7": {"family": "claude", "max_long_edge": 2576, "max_tokens": 4784},
+    "opus-4.8": {"family": "claude", "max_long_edge": 2576, "max_tokens": 4784},
     # Gemini family — all models use the same tile-based pipeline
     "gemini-3-flash": {"family": "gemini"},
     "gemini-3-flash-preview": {"family": "gemini"},

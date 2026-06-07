@@ -46,6 +46,7 @@ from vision_prep import MODEL_LIMITS  # noqa: E402
 # Claude CLI uses model IDs like "claude-opus-4-7", "claude-sonnet-4-6".
 CLAUDE_MODEL_MAP: dict[str, tuple[str, str]] = {
     # short_name → (cli_model_id, vision_prep_key)
+    "opus-4.8": ("claude-opus-4-8", "opus-4.8"),
     "opus-4.7": ("claude-opus-4-7", "opus-4.7"),
     "sonnet": ("claude-sonnet-4-6", "sonnet"),
     "haiku": ("claude-haiku-4-5", "haiku"),
@@ -54,10 +55,10 @@ CLAUDE_MODEL_MAP: dict[str, tuple[str, str]] = {
 DOT_RADIUS = 8
 DOT_COLOR = (255, 0, 0)
 PROMPT = (
-    "The attached image is {w} pixels wide and {h} pixels tall. There is "
-    "exactly one red dot somewhere in it. Output ONLY the dot center's "
-    "pixel coordinates as two integers separated by a comma in the form "
-    "'x,y' — no other text, no labels, no explanation, no markdown."
+    "There is exactly one red dot in the attached image. Output ONLY the dot "
+    "center's pixel coordinates as two integers separated by a comma in the "
+    "form 'x,y' — no other text, no labels, no explanation, no markdown. "
+    "Do not state the image dimensions."
 )
 
 
@@ -183,8 +184,11 @@ def positions_for(w: int, h: int, n: int) -> list[tuple[int, int]]:
 def run(rows: list[dict], provider: str, model_short: str, model_id: str,
         side: int, positions: list[tuple[int, int]], out_dir: Path,
         timeout: int):
-    for (gx, gy) in positions:
-        img_path = out_dir / f"{provider}_{model_short}_{side}_{gx}_{gy}.png"
+    for idx, (gx, gy) in enumerate(positions):
+        # Neutral filename — the dot position must NOT appear in the path,
+        # since call_claude/gemini pass "@{image_path}" as prompt text and the
+        # model could read the answer straight out of the filename.
+        img_path = out_dir / f"{provider}_{model_short}_{side}_{idx}.png"
         generate_image(img_path, side, side, (gx, gy))
         t0 = time.time()
         try:

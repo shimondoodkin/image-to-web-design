@@ -4,3 +4,10 @@ __pycache__/
 .venv/
 venv/
 .env
+.clicom/
+
+# scratch / generated test artifacts (validation + sweep runs)
+skills/image-cut/scripts/_sweep_out/
+skills/image-cut/scripts/_validate_out/*.png
+skills/image-cut/scripts/_validate_out/*.png.json
+skills/image-cut/scripts/_validate_out/*.ANSWER.txt

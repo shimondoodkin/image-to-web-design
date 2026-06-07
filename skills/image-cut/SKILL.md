@@ -148,6 +148,41 @@ quality 98.
   each probe's edge point to global. Assemble final bbox from translated
   values.
 
+## Zero-config coordinate prep — `prep_claude` + `resolve_coords`
+
+For Claude coordinate work, two single-purpose tools bake in the settled
+findings from the 2026-06-07 Opus 4.8 study
+(`docs/research/2026-06-07-opus48-coordinate-accuracy.md`) — no tuning:
+
+```bash
+# 1. any image -> Claude-coordinate-ready (downscale/pad to the 768 sweet spot,
+#    + 50px right/bottom margin, content at (0,0))
+python tools/prep_claude.py screenshot.png --out look.png      # [--model opus-4.8]
+
+# 2. ask Claude for coordinates in look.png, then map them back to the original
+python tools/resolve_coords.py --output look.png \
+    --coords '{"logo":[40,30],"cta":[700,480,760,510]}'
+```
+
+`resolve_coords` accepts points `[x,y]`, boxes `[x1,y1,x2,y2]`, polygons, point
+dicts `{"x":..,"y":..}`, **named entities** and nested **arrays** — shape
+preserved. Reads the transform from `look.png.json` (exact) or `--input`.
+
+**Why these defaults (all measured):**
+- **Coordinate magnitude, not canvas size, drives error.** Keep the long edge
+  at **768** (the sweet spot, ~1px). Above ~1000 it goes bimodal/unusable
+  (200–650px misses); hard max ~960.
+- **Corner dead-zone:** a target against the bottom/right edge loses ~8px even
+  at 768 — the **50px margin** restores ~0.3px. Exact ×28 sizes (e.g. 1876) are
+  the *worst* (content corner sits on the pad-to-28 boundary).
+- **Tiny inputs (<~200px) hallucinate** → padded **up** to a 768 canvas (≤1px,
+  content stays sharp).
+- **For fine detail on a big source: crop the ROI first**, then prep — never
+  enlarge the whole canvas (keeps the target at small coordinates).
+
+`opus-4.8` = `opus-4.7` caps (2576px / 4784 tokens); 4.8 roughly halves 4.7's
+localization error.
+
 ## Low-level toolkit (advanced)
 
 If `prep`/`points` don't fit (e.g., custom transform chains, manual
