@@ -1,6 +1,6 @@
 [project]
 name = "image-to-web-design-kit"
-version = "0.2.0"
+version = "0.3.0"
 description = "A kit of small skills for converting design images into pixel-perfect React webpages. Includes an atomic image-edit primitive, isolation recipes, an orchestrator, the image-cut tools, and a self-contained ChatGPT edition."
 requires-python = ">=3.10"
 dependencies = ["Pillow>=10.0"]
